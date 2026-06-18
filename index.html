@@ -1,0 +1,1231 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кафе "Козерог"</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400;700&display=swap" rel="stylesheet">
+    <!-- bcryptjs для хеширования паролей в браузере -->
+    <script src="https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/dist/bcrypt.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #c9a66b;
+            --primary-hover: #b08d55;
+            --secondary-color: #fcfbf8;
+            --accent-color: #e6ded3;
+            --text-dark: #4a4a4a;
+            --text-light: #7a7a7a;
+            --border-color: #efe8e0;
+        }
+        body { font-family: 'Lato', sans-serif; background-color: var(--secondary-color); color: var(--text-dark); overflow-x: hidden; }
+        h1,h2,h3,h4,h5,h6,.navbar-brand { font-family: 'Playfair Display', serif; }
+        .navbar { background-color: rgba(255,255,255,0.98); box-shadow: 0 2px 15px rgba(201,166,107,0.1); padding: 15px 0; backdrop-filter: blur(10px); }
+        .navbar-brand { font-size: 1.8rem; color: var(--primary-color); font-weight: 700; letter-spacing: 1px; }
+        .nav-link { color: var(--text-dark); text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.85rem; font-weight: 600; margin: 0 10px; transition: color 0.3s; }
+        .nav-link:hover { color: var(--primary-color); }
+        .btn-primary { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; padding: 12px 35px; border-radius: 2px; text-transform: uppercase; letter-spacing: 1.5px; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease; }
+        .btn-primary:hover,.btn-primary:focus { background-color: var(--primary-hover); border-color: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(201,166,107,0.3); }
+        .btn-outline-primary { color: var(--primary-color); border-color: var(--primary-color); border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-outline-primary:hover { background-color: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+        .btn-outline-dark { border-radius: 2px; text-transform: uppercase; letter-spacing: 1px; }
+        .carousel-item { height: 85vh; min-height: 500px; }
+        .carousel-item img { object-fit: cover; height: 100%; width: 100%; filter: brightness(0.9); }
+        .carousel-caption { bottom:0;left:0;right:0;top:0; background:rgba(0,0,0,0.2); display:flex; flex-direction:column; justify-content:center; align-items:center; padding:20px; }
+        .hero-content { background:rgba(255,255,255,0.9); padding:50px; max-width:800px; text-align:center; border:1px solid rgba(201,166,107,0.3); box-shadow:0 10px 40px rgba(0,0,0,0.1); }
+        .carousel-caption h1 { font-size:4rem; margin-bottom:1.5rem; color:var(--text-dark); text-shadow:none; letter-spacing:2px; }
+        .carousel-caption p { font-size:1.3rem; color:var(--text-light); margin-bottom:2rem; font-weight:300; }
+        section { padding: 100px 0; }
+        .bg-light-section { background-color: var(--accent-color); }
+        .section-title { text-align:center; margin-bottom:70px; position:relative; }
+        .section-title h2 { font-size:3rem; color:var(--text-dark); margin-bottom:20px; font-weight:400; }
+        .section-title p { color:var(--text-light); font-size:1.2rem; max-width:600px; margin:0 auto; font-style:italic; font-family:'Playfair Display',serif; }
+        .section-title::after { content:''; display:block; width:60px; height:2px; background:var(--primary-color); margin:25px auto 0; }
+        .advantage-card { text-align:center; padding:40px 30px; background:#fff; border:1px solid var(--border-color); height:100%; transition:all 0.4s ease; }
+        .advantage-card:hover { transform:translateY(-10px); box-shadow:0 15px 30px rgba(201,166,107,0.15); border-color:var(--primary-color); }
+        .advantage-icon { font-size:2.5rem; color:var(--primary-color); margin-bottom:25px; display:inline-block; width:80px; height:80px; line-height:80px; border-radius:50%; background:var(--secondary-color); }
+        .advantage-card h4 { margin-bottom:15px; font-size:1.4rem; color:var(--text-dark); }
+        .review-card { background:#fff; padding:40px; text-align:center; border-radius:2px; border:1px solid var(--border-color); margin:20px auto; max-width:800px; }
+        .review-text { font-style:italic; font-size:1.1rem; color:var(--text-dark); margin-bottom:20px; font-family:'Playfair Display',serif; }
+        .review-author { font-weight:700; color:var(--primary-color); text-transform:uppercase; font-size:0.9rem; letter-spacing:1px; }
+        .review-date { color:var(--text-light); font-size:0.8rem; margin-top:5px; }
+        .nav-pills .nav-link { color:var(--text-light); background:transparent; font-size:1rem; padding:12px 30px; border-radius:2px; margin:0 5px; text-transform:uppercase; letter-spacing:1px; border:1px solid transparent; font-family:'Lato',sans-serif; }
+        .nav-pills .nav-link:hover { color:var(--primary-color); background:rgba(201,166,107,0.1); }
+        .nav-pills .nav-link.active { background-color:var(--primary-color); color:#fff; border-color:var(--primary-color); }
+        .menu-card { border:1px solid var(--border-color); box-shadow:none; transition:all 0.3s; background:#fff; border-radius:2px; }
+        .menu-card:hover { transform:translateY(-5px); box-shadow:0 10px 30px rgba(0,0,0,0.08); border-color:var(--primary-color); }
+        .menu-card img { height:240px; object-fit:cover; border-bottom:1px solid var(--border-color); }
+        .menu-card .card-body { padding:30px; }
+        .menu-card .card-title { font-family:'Playfair Display',serif; font-size:1.3rem; color:var(--text-dark); }
+        .price { font-size:1.2rem; font-weight:700; color:var(--primary-color); font-family:'Lato',sans-serif; }
+        .event-card { position:relative; overflow:hidden; height:350px; margin-bottom:30px; box-shadow:0 5px 15px rgba(0,0,0,0.05); border-radius:2px; }
+        .event-card img { width:100%; height:100%; object-fit:cover; transition:transform 0.6s ease; }
+        .event-card:hover img { transform:scale(1.05); }
+        .event-overlay { position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top,rgba(74,74,74,0.9),transparent); padding:30px; color:#fff; text-align:center; }
+        .event-overlay h3 { margin:0; font-size:1.8rem; font-weight:400; letter-spacing:1px; }
+        .event-overlay p { font-weight:300; opacity:0.9; margin-top:5px; font-size:0.95rem; }
+        .form-control,.form-select { background-color:#fff; border:1px solid #e0e0e0; color:var(--text-dark); border-radius:2px; padding:15px; font-weight:300; }
+        .form-label { font-weight:600; font-size:0.9rem; letter-spacing:0.5px; color:var(--text-light); text-transform:uppercase; }
+        .form-control:focus,.form-select:focus { border-color:var(--primary-color); box-shadow:0 0 0 0.2rem rgba(201,166,107,0.2); }
+        .qr-section { background-color:var(--secondary-color); text-align:center; border-top:1px solid var(--border-color); }
+        .contact-info-section { background-color:#fff; padding:80px 0; }
+        .contact-card { background:var(--secondary-color); padding:40px; border-radius:2px; height:100%; border:1px solid var(--border-color); }
+        .contact-item { display:flex; align-items:flex-start; margin-bottom:25px; }
+        .contact-icon { font-size:1.5rem; color:var(--primary-color); margin-right:20px; min-width:30px; }
+        .contact-text h5 { font-size:1.1rem; margin-bottom:5px; color:var(--text-dark); font-family:'Playfair Display',serif; }
+        .contact-text p { color:var(--text-light); margin-bottom:0; font-size:0.95rem; }
+        .map-container { height:100%; min-height:400px; border-radius:2px; overflow:hidden; box-shadow:0 5px 15px rgba(0,0,0,0.05); }
+        footer { background-color:#2c2c2c; padding:80px 0 40px; color:#dcdcdc; font-weight:300; }
+        footer h5 { color:#fff; margin-bottom:25px; font-size:1.3rem; letter-spacing:1px; text-transform:uppercase; }
+        footer ul li { margin-bottom:15px; }
+        footer a { color:#dcdcdc; text-decoration:none; transition:color 0.3s; }
+        footer a:hover { color:var(--primary-color); }
+        .social-icons a { display:inline-flex; align-items:center; justify-content:center; width:45px; height:45px; background:rgba(255,255,255,0.1); color:#fff; border-radius:50%; margin-right:10px; transition:all 0.3s; font-size:1.2rem; }
+        .social-icons a:hover { background:var(--primary-color); transform:translateY(-3px); }
+        .modal-content { border-radius:2px; border:none; }
+        .modal-header { background-color:var(--secondary-color); border-bottom:1px solid var(--border-color); }
+        .modal-title { font-family:'Playfair Display',serif; color:var(--text-dark); }
+        /* Оверлей успеха */
+        .success-overlay { position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; display:none; align-items:center; justify-content:center; opacity:0; transition:opacity 0.3s ease; }
+        .success-message { background:#fff; padding:50px; border-radius:5px; text-align:center; max-width:500px; transform:scale(0.8); transition:transform 0.3s ease; box-shadow:0 25px 50px rgba(0,0,0,0.3); }
+        .success-icon { color:var(--primary-color); font-size:4rem; margin-bottom:20px; }
+        .success-overlay.show { display:flex; opacity:1; }
+        .success-overlay.show .success-message { transform:scale(1); }
+        /* Авторизация */
+        .auth-nav-btn { font-size:0.82rem; padding:6px 18px; border-radius:2px; }
+        #userNavInfo { display:none; }
+        /* Блокировка аккаунта */
+        .lockout-alert { background:#fff3cd; border-left:4px solid #ffc107; padding:14px 18px; border-radius:2px; margin-bottom:14px; display:none; font-size:0.9rem; }
+        .lockout-alert i { color:#ffc107; }
+        /* Заказы и бронирования в ЛК */
+        .account-section { background:#fff; border:1px solid var(--border-color); border-radius:4px; padding:20px; margin-bottom:16px; }
+        .account-section h6 { color:var(--primary-color); font-size:0.95rem; text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; font-family:'Lato',sans-serif; font-weight:700; }
+        .record-item { background:var(--secondary-color); border:1px solid var(--border-color); border-radius:2px; padding:14px 18px; margin-bottom:10px; font-size:0.9rem; }
+        .record-item .badge { font-size:0.75rem; }
+        .form-invalid { border-color:#dc3545 !important; }
+        .invalid-msg { color:#dc3545; font-size:0.82rem; margin-top:4px; }
+        /* Прогресс-бар попыток */
+        .attempts-bar { height:4px; border-radius:2px; background:#eee; margin-top:8px; overflow:hidden; }
+        .attempts-bar-fill { height:100%; border-radius:2px; transition:width 0.4s, background 0.4s; }
+    </style>
+</head>
+<body>
+
+<!-- ── Оверлей успеха ─────────────────────────────────────────────────── -->
+<div id="successOverlay" class="success-overlay">
+    <div class="success-message">
+        <i class="bi bi-check-circle-fill success-icon"></i>
+        <h2 style="font-family:'Playfair Display',serif;" id="successTitle">Спасибо!</h2>
+        <p class="lead mt-3" id="successText"></p>
+        <button class="btn btn-primary mt-4" onclick="closeSuccessMessage()">Отлично</button>
+    </div>
+</div>
+
+<!-- ── Навигация ──────────────────────────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">КОЗЕРОГ</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item"><a class="nav-link" href="#home">Главная</a></li>
+                <li class="nav-item"><a class="nav-link" href="#advantages">О нас</a></li>
+                <li class="nav-item"><a class="nav-link" href="#menu">Меню</a></li>
+                <li class="nav-item"><a class="nav-link" href="#events">Мероприятия</a></li>
+                <li class="nav-item"><a class="nav-link" href="#booking">Заказ</a></li>
+                <li class="nav-item"><a class="nav-link" href="#contacts">Контакты</a></li>
+                <!-- Гость -->
+                <li class="nav-item ms-lg-2" id="guestNavBtns">
+                    <button class="btn btn-outline-primary auth-nav-btn me-1" data-bs-toggle="modal" data-bs-target="#loginModal">Войти</button>
+                    <button class="btn btn-primary auth-nav-btn" data-bs-toggle="modal" data-bs-target="#registerModal">Регистрация</button>
+                </li>
+                <!-- Авторизованный -->
+                <li class="nav-item ms-lg-2" id="userNavInfo">
+                    <span class="me-2 small text-muted" id="navUserName"></span>
+                    <button class="btn btn-outline-dark auth-nav-btn me-1" data-bs-toggle="modal" data-bs-target="#accountModal">Мой аккаунт</button>
+                    <button class="btn btn-outline-dark auth-nav-btn" onclick="logout()">Выйти</button>
+                </li>
+                <li class="nav-item ms-lg-2">
+                    <button class="btn btn-primary btn-sm rounded-0 px-4" data-bs-toggle="modal" data-bs-target="#bookingModal">Бронь</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- ── Карусель ───────────────────────────────────────────────────────── -->
+<header id="home">
+    <div id="heroCarousel" class="carousel slide carousel-fade" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="день рождения.jpg" class="d-block w-100" alt="Кафе Козерог" onerror="this.style.cssText='height:85vh;background:linear-gradient(135deg,#c9a66b,#4a3000)'">
+                <div class="carousel-caption">
+                    <div class="hero-content">
+                        <h1>Кафе "Козерог"</h1>
+                        <p class="lead">Уютное место для незабываемых моментов</p>
+                        <a href="#menu" class="btn btn-primary mt-2">Смотреть Меню</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="3.jpg" class="d-block w-100" alt="Интерьер" onerror="this.style.cssText='height:85vh;background:linear-gradient(135deg,#8b6914,#c9a66b)'">
+                <div class="carousel-caption">
+                    <div class="hero-content">
+                        <h1>Праздничная Атмосфера</h1>
+                        <p class="lead">Идеально для свадеб и юбилеев</p>
+                        <a href="#events" class="btn btn-primary mt-2">Наши Залы</a>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="стол.jpg" class="d-block w-100" alt="Сервировка" onerror="this.style.cssText='height:85vh;background:linear-gradient(135deg,#c9a66b,#2c2c2c)'">
+                <div class="carousel-caption">
+                    <div class="hero-content">
+                        <h1>Изысканная Кухня</h1>
+                        <p class="lead">Вкусные блюда для вашего стола</p>
+                        <button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#bookingModal">Забронировать Стол</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+    </div>
+</header>
+
+<!-- ── Преимущества ───────────────────────────────────────────────────── -->
+<section id="advantages" class="bg-light-section">
+    <div class="container">
+        <div class="section-title"><h2>Почему Мы?</h2><p>Мы создаем комфорт и вкус для каждого гостя</p></div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="bi bi-cup-hot-fill"></i></div>
+                    <h4>Вкусная Еда</h4>
+                    <p class="text-muted">Только свежие продукты и авторские рецепты.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="bi bi-people-fill"></i></div>
+                    <h4>Просторный Зал</h4>
+                    <p class="text-muted">Уютная атмосфера для компании любого размера — от 2 до 60 человек.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="advantage-card">
+                    <div class="advantage-icon"><i class="bi bi-music-note-beamed"></i></div>
+                    <h4>Любая музыка на ваш вкус</h4>
+                    <p class="text-muted">Музыкальное сопровождение для создания праздничного настроения по вечерам.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Отзывы ─────────────────────────────────────────────────────────── -->
+<section id="reviews" class="py-5">
+    <div class="container">
+        <div class="section-title text-center mb-4"><h2>Отзывы Гостей</h2><p>Что говорят о нас наши посетители</p></div>
+        <div id="reviewsCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+                <div class="carousel-item active">
+                    <div class="review-card d-flex flex-column align-items-center text-center px-3">
+                        <img src="Анна.jpg" alt="Анна Омеличко" class="rounded-circle mb-3" style="width:120px;height:120px;object-fit:cover;border:2px solid var(--primary-color);" onerror="this.style.display='none'">
+                        <p class="review-text fst-italic">"Отмечали юбилей мужа. Всё прошло великолепно! Кухня домашняя, очень вкусная. Гости были в восторге от горячего и закусок."</p>
+                        <div class="review-author fw-bold">Анна Омеличко</div>
+                        <div class="review-date text-muted small">12 декабря 2025</div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="review-card d-flex flex-column align-items-center text-center px-3">
+                        <img src="Ольга.jpg" alt="Ольга Гунова" class="rounded-circle mb-3" style="width:120px;height:120px;object-fit:cover;border:2px solid var(--primary-color);" onerror="this.style.display='none'">
+                        <p class="review-text fst-italic">"Заказывали поминальный обед. Всё организовали достойно, тихо и спокойно. Персонал тактичный. Спасибо за профессионализм."</p>
+                        <div class="review-author fw-bold">Ольга Гунова</div>
+                        <div class="review-date text-muted small">5 декабря 2025</div>
+                    </div>
+                </div>
+                <div class="carousel-item">
+                    <div class="review-card d-flex flex-column align-items-center text-center px-3">
+                        <img src="Антон.jpg" alt="Антон Коновалов" class="rounded-circle mb-3" style="width:120px;height:120px;object-fit:cover;border:2px solid var(--primary-color);" onerror="this.style.display='none'">
+                        <p class="review-text fst-italic">"Отличное место для корпоратива! Просторный зал, вкусная еда, есть место для танцев. Цены очень приятные."</p>
+                        <div class="review-author fw-bold">Антон Коновалов</div>
+                        <div class="review-date text-muted small">20 ноября 2025</div>
+                    </div>
+                </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="prev"><span class="carousel-control-prev-icon bg-dark rounded-circle p-2"></span></button>
+            <button class="carousel-control-next" type="button" data-bs-target="#reviewsCarousel" data-bs-slide="next"><span class="carousel-control-next-icon bg-dark rounded-circle p-2"></span></button>
+        </div>
+    </div>
+</section>
+
+<!-- ── Меню ───────────────────────────────────────────────────────────── -->
+<section id="menu" class="bg-light-section">
+    <div class="container">
+        <div class="section-title"><h2>Наше Меню</h2><p>Попробуйте разнообразие наших блюд</p></div>
+        <ul class="nav nav-pills justify-content-center mb-5" id="menuTabs">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="pill" data-bs-target="#hot">Горячее</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#snacks">Закуски</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#salads">Салаты</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="pill" data-bs-target="#cuts">Нарезки</button></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" id="hot">
+                <div class="row g-4">
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="мясо по барски.jpg" class="card-img-top" alt="Мясо по-барски" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Отбивная свинина по-«Барски»</h5><span class="price">250 ₽</span></div><p class="card-text text-muted">Свинина, сол. огурец, грецкий орех, чеснок, зелень, майонез.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Отбивная свинина по-«Барски» — 250 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="мясо по королевски.jpg" class="card-img-top" alt="Мясо по-королевски" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Мясо по-Королевски</h5><span class="price">250 ₽</span></div><p class="card-text text-muted">Свинина, помидор, лук обжаренный, сыр, майонез.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Мясо по-Королевски — 250 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="отбивная куриная с грибами и сыром.jpg" class="card-img-top" alt="Куриная отбивная" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Отбивная куриная с грибами</h5><span class="price">230 ₽</span></div><p class="card-text text-muted">Нежная куриная отбивная с шампиньонами и сырной шапкой.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Отбивная куриная с грибами — 230 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="по деревенски.png" class="card-img-top" alt="Картофельные дольки" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Картофельные дольки по-деревенски</h5><span class="price">120 ₽</span></div><p class="card-text text-muted">Ароматный картофель с зеленью и чесноком.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Картофельные дольки по-деревенски — 120 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="фри.jpg" class="card-img-top" alt="Картофель фри" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Картофель Фри</h5><span class="price">150 ₽</span></div><p class="card-text text-muted">Хрустящий золотистый картофель.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Картофель Фри — 150 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="рис с морепродуктами.jpg" class="card-img-top" alt="Рис с морепродуктами" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Рис с морепродуктами</h5><span class="price">350 ₽</span></div><p class="card-text text-muted">Рассыпчатый рис с креветками и овощами.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Рис с морепродуктами — 350 ₽')">В корзину</button></div></div></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="snacks">
+                <div class="row g-4">
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="жульен.jpg" class="card-img-top" alt="Жульен" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Жульен в тарталетках</h5><span class="price">180 ₽</span></div><p class="card-text text-muted">Грибы, курица, колбаса и сыр в хрустящей корзиночке.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Жульен в тарталетках — 180 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="канаппе.jpg" class="card-img-top" alt="Канапе" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Канапе Ассорти</h5><span class="price">80 ₽</span></div><p class="card-text text-muted">Креветки, крабовые палочки, укроп.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Канапе Ассорти — 80 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="мешочки.jpg" class="card-img-top" alt="Мешочки" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Мешочки из блинов</h5><span class="price">80 ₽</span></div><p class="card-text text-muted">Фаршированные мясом курицы, яйцом, сыром и грибами.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Мешочки из блинов — 80 ₽')">В корзину</button></div></div></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="salads">
+                <div class="row g-4">
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="грибной салат.jpg" class="card-img-top" alt="Салат" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Салат Грибной</h5><span class="price">250 ₽</span></div><p class="card-text text-muted">Маринованные грибы, лук, зелень и масло.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Салат Грибной — 250 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="цезарь-с-курицей.jpg" class="card-img-top" alt="Салат Цезарь" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Салат Цезарь</h5><span class="price">210 ₽</span></div><p class="card-text text-muted">Листья салата, черри, филе курицы, яйцо, сухарики, сыр Пармезан.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Салат Цезарь — 210 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="сытный.png" class="card-img-top" alt="Салат" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Салат «Сытный»</h5><span class="price">150 ₽</span></div><p class="card-text text-muted">Куриная печень, морковь, лук, яйцо, яблоко, чеснок, сметана.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Салат «Сытный» — 150 ₽')">В корзину</button></div></div></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="cuts">
+                <div class="row g-4">
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="мясная нарезка.jpg" class="card-img-top" alt="Мясная нарезка" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Ассорти мясное</h5><span class="price">500 ₽</span></div><p class="card-text text-muted">Колбаса сырокопченая, куриная, ветчина, грудинка копченая.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Ассорти мясное — 500 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="ассорти рыбное.jpg" class="card-img-top" alt="Рыбная нарезка" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Ассорти рыбное</h5><span class="price">500 ₽</span></div><p class="card-text text-muted">Горбуша (балык), форель, лимон, оливки.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Ассорти рыбное — 500 ₽')">В корзину</button></div></div></div>
+                    <div class="col-md-4"><div class="card menu-card h-100"><img src="ассорти овощное.jpg" class="card-img-top" alt="Овощная нарезка" onerror="this.style.display='none'"><div class="card-body"><div class="d-flex justify-content-between mb-2"><h5 class="card-title">Ассорти овощное</h5><span class="price">400 ₽</span></div><p class="card-text text-muted">Огурец, помидор, болгарский перец, редис, лист салата, укроп.</p><button class="btn btn-outline-primary btn-sm w-100 mt-2" onclick="addToCart(this,'Ассорти овощное — 400 ₽')">В корзину</button></div></div></div>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-5"><button class="btn btn-primary btn-lg px-5" data-bs-toggle="modal" data-bs-target="#fullMenuModal">Показать всё меню</button></div>
+    </div>
+</section>
+
+<!-- ── Мероприятия ────────────────────────────────────────────────────── -->
+<section id="events" class="bg-light-section">
+    <div class="container">
+        <div class="section-title"><h2>Наши Мероприятия</h2><p>Проведите важный день вместе с нами</p></div>
+        <div class="row g-4">
+            <div class="col-md-4"><div class="event-card"><img src="юбелии.jpg" alt="Юбилей" onerror="this.style.background='#c9a66b'"><div class="event-overlay"><h3>Юбилеи</h3><p class="mb-0">Праздничное оформление и фотозона</p></div></div></div>
+            <div class="col-md-4"><div class="event-card"><img src="свадьба.jpg" alt="Поминальные обеды" onerror="this.style.background='#8b6914'"><div class="event-overlay"><h3>Поминальные Обеды</h3><p class="mb-0">Отдельный зал, спокойная атмосфера</p></div></div></div>
+            <div class="col-md-4"><div class="event-card"><img src="банкеты.jpg" alt="Банкеты" onerror="this.style.background='#4a3000'"><div class="event-overlay"><h3>Банкеты</h3><p class="mb-0">Изысканная сервировка столов</p></div></div></div>
+        </div>
+        <div class="row mt-4 g-4 justify-content-center">
+            <div class="col-md-6"><div class="event-card"><img src="корпаратив.jpg" alt="Корпоратив" onerror="this.style.background='#b08d55'"><div class="event-overlay"><h3>Корпоративы</h3><p class="mb-0">Вместимость до 60 человек</p></div></div></div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Форма заказа ───────────────────────────────────────────────────── -->
+<section id="booking" style="max-width:900px;margin:0 auto;font-family:Arial,sans-serif;color:#333;border:2px solid white;border-radius:8px;">
+    <div style="display:flex;gap:20px;background:#ccc9c9;padding:30px;border-radius:6px;align-items:stretch;">
+        <div style="flex:1;display:flex;align-items:stretch;">
+            <img src="2.jpg" alt="Фото" style="width:100%;height:100%;object-fit:cover;border-radius:8px;" onerror="this.style.cssText='min-height:300px;border-radius:8px;background:linear-gradient(135deg,#c9a66b,#4a3000)'">
+        </div>
+        <div style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <h2 style="margin-bottom:10px;font-weight:500;font-family:'Playfair Display',serif;">Оформить Заказ</h2>
+            <p style="font-size:14px;margin-bottom:20px;">Заполните форму, и мы свяжемся с вами для подтверждения</p>
+            <div id="orderError" class="alert alert-danger" style="display:none;font-size:0.9rem;padding:10px 14px;"></div>
+            <form id="orderForm" novalidate style="font-size:14px;">
+                <div style="display:flex;gap:15px;margin-bottom:15px;">
+                    <div style="flex:1;display:flex;flex-direction:column;">
+                        <label style="font-weight:600;margin-bottom:5px;">ВАШЕ ИМЯ *</label>
+                        <input type="text" id="orderName" placeholder="Иван Иванов" required minlength="2" maxlength="100" style="padding:8px;border:1px solid #ccc;border-radius:4px;">
+                        <div class="invalid-msg" id="orderNameErr"></div>
+                    </div>
+                    <div style="flex:1;display:flex;flex-direction:column;">
+                        <label style="font-weight:600;margin-bottom:5px;">ТЕЛЕФОН *</label>
+                        <input type="tel" id="orderPhone" placeholder="+7(999)000-00-00" required style="padding:8px;border:1px solid #ccc;border-radius:4px;">
+                        <div class="invalid-msg" id="orderPhoneErr"></div>
+                    </div>
+                </div>
+                <div style="margin-bottom:15px;display:flex;flex-direction:column;">
+                    <label style="font-weight:600;margin-bottom:5px;">EMAIL (НЕОБЯЗАТЕЛЬНО)</label>
+                    <input type="email" id="orderEmail" placeholder="example@mail.ru" style="padding:8px;border:1px solid #ccc;border-radius:4px;">
+                    <div class="invalid-msg" id="orderEmailErr"></div>
+                </div>
+                <div id="cartInfo" style="display:none;margin-bottom:10px;padding:8px 12px;background:#f8f4ee;border-radius:4px;font-size:13px;color:#7a5c00;">
+                    <i class="bi bi-cart3 me-1"></i> <span id="cartText"></span>
+                </div>
+                <div style="margin-bottom:20px;display:flex;flex-direction:column;">
+                    <label style="font-weight:600;margin-bottom:5px;">КОММЕНТАРИЙ К ЗАКАЗУ</label>
+                    <textarea id="orderComment" rows="3" placeholder="Напишите ваши пожелания или список блюд" style="padding:8px;border:1px solid #ccc;border-radius:4px;resize:vertical;"></textarea>
+                </div>
+                <button type="submit" id="orderSubmitBtn" style="width:100%;background:#b59660;border:none;color:white;padding:12px;font-weight:600;border-radius:4px;cursor:pointer;font-size:14px;">
+                    ОТПРАВИТЬ ЗАКАЗ
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ── QR ─────────────────────────────────────────────────────────────── -->
+<section class="qr-section py-5">
+    <div class="container">
+        <div class="row align-items-center justify-content-center">
+            <div class="col-md-6 text-center">
+                <h2 class="mb-4">Мы в Вашем Смартфоне</h2>
+                <div class="bg-white p-3 d-inline-block rounded shadow-sm mb-3">
+                    <img src="qrcod_9zgV.png" alt="QR Code" style="width:150px;" onerror="this.style.display='none'">
+                </div>
+                <p class="lead mb-4">Отсканируйте код, чтобы сохранить нас в контактах</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Модальное: Бронирование ────────────────────────────────────────── -->
+<div class="modal fade" id="bookingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Бронирование Стола</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="bookingFormError" class="alert alert-danger" style="display:none;font-size:0.9rem;padding:10px 14px;"></div>
+                <form id="bookingForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Дата *</label>
+                        <input type="date" class="form-control" id="bookingDate" required>
+                        <div class="invalid-msg" id="bookingDateErr"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Время *</label>
+                        <input type="time" class="form-control" id="bookingTime" required>
+                        <div class="invalid-msg" id="bookingTimeErr"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Тип мероприятия</label>
+                        <select class="form-select" id="bookingEvent">
+                            <option>Ужин</option>
+                            <option>День Рождения</option>
+                            <option>Свадьба</option>
+                            <option>Корпоратив</option>
+                            <option>Поминальный обед</option>
+                            <option>Другое</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Количество гостей</label>
+                        <select class="form-select" id="bookingGuests">
+                            <option>1-2 человека</option>
+                            <option>3-4 человека</option>
+                            <option>5-10 человек</option>
+                            <option>Более 10 (Банкет)</option>
+                        </select>
+                    </div>
+                    <div class="modal-footer border-0 px-0 pb-0">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
+                        <button type="submit" class="btn btn-primary px-4">Забронировать</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Модальное: Полное меню ─────────────────────────────────────────── -->
+<div class="modal fade" id="fullMenuModal" tabindex="-1">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Полное Меню</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body bg-light">
+                <div class="row g-4 justify-content-center">
+                    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0 text-white">Горячее</h5></div><img src="горячее.jpg" class="img-fluid" alt="Меню Горячее" onerror="this.style.display='none'"></div></div>
+                    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0 text-white">Закуски</h5></div><img src="закуски.jpg" class="img-fluid" alt="Меню Закуски" onerror="this.style.display='none'"></div></div>
+                    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0 text-white">Салаты</h5></div><img src="салаты.jpg" class="img-fluid" alt="Меню Салаты" onerror="this.style.display='none'"></div></div>
+                    <div class="col-md-6"><div class="card shadow-sm"><div class="card-header bg-primary text-white"><h5 class="mb-0 text-white">Нарезки</h5></div><img src="нарезка.jpg" class="img-fluid" alt="Меню Нарезки" onerror="this.style.display='none'"></div></div>
+                </div>
+            </div>
+            <div class="modal-footer"><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button></div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Модальное: Вход ────────────────────────────────────────────────── -->
+<div class="modal fade" id="loginModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-box-arrow-in-right me-2" style="color:var(--primary-color)"></i>Вход в аккаунт</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Блокировка аккаунта -->
+                <div id="loginLockout" class="lockout-alert">
+                    <i class="bi bi-lock-fill me-2"></i><span id="loginLockoutText"></span>
+                    <div class="attempts-bar mt-2"><div id="lockoutBar" class="attempts-bar-fill" style="background:#ffc107;width:100%"></div></div>
+                </div>
+                <!-- Ошибка входа -->
+                <div id="loginError" class="alert alert-danger" style="display:none;font-size:0.9rem;padding:10px 14px;"></div>
+                <!-- Счётчик попыток -->
+                <div id="attemptsInfo" style="display:none;margin-bottom:10px;">
+                    <div class="d-flex justify-content-between mb-1" style="font-size:0.82rem;color:#dc3545;">
+                        <span>Неверный пароль</span><span id="attemptsLeft"></span>
+                    </div>
+                    <div class="attempts-bar"><div id="attemptsBar" class="attempts-bar-fill" style="background:#dc3545;"></div></div>
+                </div>
+                <form id="loginForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" class="form-control" id="loginEmail" required placeholder="your@email.ru">
+                        <div class="invalid-msg" id="loginEmailErr"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="loginPassword" required placeholder="••••••">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('loginPassword',this)"><i class="bi bi-eye"></i></button>
+                        </div>
+                        <div class="invalid-msg" id="loginPasswordErr"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="loginSubmitBtn">Войти</button>
+                </form>
+                <p class="text-center mt-3 mb-0 small">Нет аккаунта? <a href="#" onclick="switchModal('loginModal','registerModal')">Зарегистрироваться</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Модальное: Регистрация ─────────────────────────────────────────── -->
+<div class="modal fade" id="registerModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-person-plus me-2" style="color:var(--primary-color)"></i>Регистрация</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="registerError" class="alert alert-danger" style="display:none;font-size:0.9rem;padding:10px 14px;"></div>
+                <form id="registerForm" novalidate>
+                    <div class="mb-3">
+                        <label class="form-label">Ваше имя *</label>
+                        <input type="text" class="form-control" id="regName" required minlength="2" maxlength="100" placeholder="Иван Иванов">
+                        <div class="invalid-msg" id="regNameErr"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email *</label>
+                        <input type="email" class="form-control" id="regEmail" required placeholder="your@email.ru">
+                        <div class="invalid-msg" id="regEmailErr"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Пароль *</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="regPassword" required minlength="6" placeholder="Минимум 6 символов">
+                            <button class="btn btn-outline-secondary" type="button" onclick="togglePwd('regPassword',this)"><i class="bi bi-eye"></i></button>
+                        </div>
+                        <div class="invalid-msg" id="regPasswordErr"></div>
+                        <!-- Индикатор силы пароля -->
+                        <div class="mt-2" id="pwdStrengthWrap" style="display:none;">
+                            <div class="attempts-bar"><div id="pwdStrengthBar" class="attempts-bar-fill" style="width:0;"></div></div>
+                            <div style="font-size:0.78rem;margin-top:3px;" id="pwdStrengthLabel"></div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Повторите пароль *</label>
+                        <input type="password" class="form-control" id="regPassword2" required placeholder="Повторите пароль">
+                        <div class="invalid-msg" id="regPassword2Err"></div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100" id="registerSubmitBtn">Зарегистрироваться</button>
+                </form>
+                <p class="text-center mt-3 mb-0 small">Уже есть аккаунт? <a href="#" onclick="switchModal('registerModal','loginModal')">Войти</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Модальное: Личный кабинет ─────────────────────────────────────── -->
+<div class="modal fade" id="accountModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="bi bi-person-circle me-2" style="color:var(--primary-color)"></i>Личный кабинет</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex align-items-center mb-4 p-3" style="background:var(--secondary-color);border-radius:4px;border:1px solid var(--border-color);">
+                    <div class="me-3" style="width:50px;height:50px;background:var(--primary-color);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1.4rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700;font-size:1.1rem;" id="accountName"></div>
+                        <div style="color:var(--text-light);font-size:0.9rem;" id="accountEmail"></div>
+                        <div style="color:var(--text-light);font-size:0.8rem;" id="accountDate"></div>
+                    </div>
+                </div>
+                <!-- Заказы -->
+                <div class="account-section">
+                    <h6><i class="bi bi-bag me-2"></i>Мои заказы</h6>
+                    <div id="accountOrders"><p class="text-muted small mb-0">Нет заказов</p></div>
+                </div>
+                <!-- Бронирования -->
+                <div class="account-section">
+                    <h6><i class="bi bi-calendar-check me-2"></i>Мои бронирования</h6>
+                    <div id="accountBookings"><p class="text-muted small mb-0">Нет бронирований</p></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-danger btn-sm" onclick="logout();bootstrap.Modal.getInstance(document.getElementById('accountModal')).hide();">
+                    <i class="bi bi-box-arrow-right me-1"></i>Выйти
+                </button>
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Контакты ───────────────────────────────────────────────────────── -->
+<section id="contacts" class="contact-info-section">
+    <div class="container">
+        <div class="section-title"><h2>Контакты</h2><p>Мы всегда рады видеть вас</p></div>
+        <div class="row g-4">
+            <div class="col-lg-5">
+                <div class="contact-card">
+                    <div class="contact-item"><i class="bi bi-geo-alt-fill contact-icon"></i><div class="contact-text"><h5>Адрес</h5><p>Почтовая улица, 57,<br>с. Нижняя Омка, Нижнеомский район</p></div></div>
+                    <div class="contact-item"><i class="bi bi-telephone-fill contact-icon"></i><div class="contact-text"><h5>Телефон</h5><p>+7 (902) 673-01-13</p></div></div>
+                    <div class="contact-item"><i class="bi bi-envelope-fill contact-icon"></i><div class="contact-text"><h5>Email</h5><p>tatyanainoz86@gmail.com</p></div></div>
+                    <div class="contact-item"><i class="bi bi-clock-fill contact-icon"></i><div class="contact-text"><h5>Режим работы</h5><p>Пн-Пт: 10:00 – 23:00<br>Сб-Вс: 11:00 – 00:00</p></div></div>
+                    <div class="mt-4 pt-3 border-top border-light">
+                        <button class="btn btn-outline-primary w-100" onclick="alert('Мы перезвоним вам в ближайшее время!')">Заказать звонок</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="map-container" style="height:350px;">
+                    <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2263.57991006416!2d74.92920687736722!3d55.43511967296832!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4300f1eea7944fbf%3A0x4e3ae00870f3728d!2z0J_QvtGH0YLQvtCy0LDRjyDRg9C7LiwgNTcsINCd0LjQttC90Y_RjyDQntC80LrQsCwg0J7QvNGB0LrQsNGPINC-0LHQuy4sIDY0NjYyMA!5e0!3m2!1sru!2sru!4v1765823521865!5m2!1sru!2sru" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ── Подвал ─────────────────────────────────────────────────────────── -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5>Кафе "Козерог"</h5>
+                <p>Лучшее место для отдыха и праздников.</p>
+                <div class="social-icons mt-4">
+                    <a href="https://t.me/tatjachka67" target="_blank" title="Telegram"><i class="bi bi-telegram"></i></a>
+                    <a href="https://wa.me/79026730113" target="_blank" title="WhatsApp"><i class="bi bi-whatsapp"></i></a>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Контакты</h5>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-geo-alt me-2" style="color:var(--primary-color)"></i>Почтовая улица, 57, с. Нижняя Омка</li>
+                    <li><i class="bi bi-telephone me-2" style="color:var(--primary-color)"></i>+7 (902) 673-01-13</li>
+                    <li><i class="bi bi-envelope me-2" style="color:var(--primary-color)"></i>tatyanainoz86@gmail.com</li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h5>Режим работы</h5>
+                <ul class="list-unstyled">
+                    <li>Пн-Пт: 10:00 - 23:00</li>
+                    <li>Сб-Вс: 11:00 - 00:00</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="border-secondary my-4" style="opacity:0.1;">
+        <div class="text-center"><p class="mb-0">&copy; 2025 Кафе "Козерог". Все права защищены.</p></div>
+    </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+'use strict';
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ПЕРЕХОД В ЛИЧНЫЙ КАБИНЕТ ПОСЛЕ ВХОДА / РЕГИСТРАЦИИ
+//  Флаг ставится в обработчиках форм; постоянные слушатели открывают кабинет
+// ═══════════════════════════════════════════════════════════════════════════
+// Принудительно закрывает модал без анимации и сразу открывает личный кабинет
+function closeAndOpenAccount(modalId) {
+    const el = document.getElementById(modalId);
+    // Убираем модал вручную — не ждём анимацию Bootstrap
+    el.classList.remove('show');
+    el.style.display = 'none';
+    el.setAttribute('aria-hidden', 'true');
+    el.removeAttribute('aria-modal');
+    // Убираем подложку и сброс body
+    document.querySelectorAll('.modal-backdrop').forEach(function(b){ b.remove(); });
+    document.body.classList.remove('modal-open');
+    document.body.style.overflow = '';
+    document.body.style.paddingRight = '';
+    // Уничтожаем экземпляр Bootstrap чтобы не было конфликтов
+    var inst = bootstrap.Modal.getInstance(el);
+    if (inst) inst.dispose();
+    // Показываем личный кабинет
+    bootstrap.Modal.getOrCreateInstance(document.getElementById('accountModal')).show();
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  БАЗА ДАННЫХ (localStorage)
+//  Ключи: kz_users, kz_orders, kz_bookings, kz_session
+// ═══════════════════════════════════════════════════════════════════════════
+
+const MAX_ATTEMPTS  = 3;          // попыток до блокировки
+const LOCK_MINUTES  = 15;         // длительность блокировки в минутах
+const LOCK_MS       = LOCK_MINUTES * 60 * 1000;
+const SALT_ROUNDS   = 10;         // стоимость bcrypt
+
+// --- Чтение/запись хранилища -----------------------------------------------
+function loadStore(key, def = []) {
+    try { return JSON.parse(localStorage.getItem(key)) ?? def; }
+    catch { return def; }
+}
+function saveStore(key, val) {
+    localStorage.setItem(key, JSON.stringify(val));
+}
+
+// --- Пользователи -----------------------------------------------------------
+function getUsers()        { return loadStore('kz_users', []); }
+function saveUsers(u)      { saveStore('kz_users', u); }
+function findUserByEmail(e){ return getUsers().find(u => u.email === e.toLowerCase().trim()); }
+
+// --- Заказы -----------------------------------------------------------------
+function getOrders()       { return loadStore('kz_orders', []); }
+function saveOrder(o)      { const list = getOrders(); list.push(o); saveStore('kz_orders', list); }
+
+// --- Бронирования -----------------------------------------------------------
+function getBookings()     { return loadStore('kz_bookings', []); }
+function saveBooking(b)    { const list = getBookings(); list.push(b); saveStore('kz_bookings', list); }
+
+// --- Сессия (JWT-подобный токен) --------------------------------------------
+//  Храним объект { userId, name, email, role, issuedAt, expiresAt }
+const SESSION_TTL_MS = 7 * 24 * 3600 * 1000; // 7 дней
+
+function encodeSession(payload) {
+    // Base64-кодирование + подпись заголовком (клиентский аналог JWT)
+    const data = btoa(JSON.stringify(payload));
+    const sig  = btoa(payload.email + payload.issuedAt + 'kz_secret');
+    return data + '.' + sig;
+}
+function decodeSession(token) {
+    if (!token) return null;
+    try {
+        const [data] = token.split('.');
+        const payload = JSON.parse(atob(data));
+        if (Date.now() > payload.expiresAt) return null; // истёк
+        return payload;
+    } catch { return null; }
+}
+function getSession()  { return decodeSession(localStorage.getItem('kz_session')); }
+function setSession(p) { localStorage.setItem('kz_session', encodeSession(p)); }
+function clearSession(){ localStorage.removeItem('kz_session'); }
+
+// --- Корзина ----------------------------------------------------------------
+let cart = [];
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ВАЛИДАЦИЯ
+// ═══════════════════════════════════════════════════════════════════════════
+
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_RE = /^[\d\+\(\)\-\s]{10,20}$/;
+
+function validateName(v)     { return v.trim().length >= 2 ? '' : 'Имя должно содержать минимум 2 символа'; }
+function validateEmail(v)    { return EMAIL_RE.test(v.trim()) ? '' : 'Введите корректный email'; }
+function validatePhone(v)    { return PHONE_RE.test(v.trim()) ? '' : 'Введите корректный номер (минимум 10 цифр)'; }
+function validatePassword(v) { return v.length >= 6 ? '' : 'Пароль должен содержать минимум 6 символов'; }
+function validateMatch(a,b)  { return a === b ? '' : 'Пароли не совпадают'; }
+function validateDate(v)     { return v ? '' : 'Выберите дату'; }
+function validateTime(v)     { return v ? '' : 'Выберите время'; }
+
+function showErr(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+    const input = el.previousElementSibling?.tagName === 'INPUT' ? el.previousElementSibling
+                : el.closest('.mb-3')?.querySelector('input,textarea');
+    if (input) { msg ? input.classList.add('form-invalid') : input.classList.remove('form-invalid'); }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ХЕШИРОВАНИЕ ПАРОЛЕЙ (bcryptjs)
+// ═══════════════════════════════════════════════════════════════════════════
+
+async function hashPassword(pwd) {
+    const salt = dcodeIO.bcrypt.genSaltSync(SALT_ROUNDS);
+    return dcodeIO.bcrypt.hashSync(pwd, salt);
+}
+
+async function checkPassword(pwd, hash) {
+    return dcodeIO.bcrypt.compareSync(pwd, hash);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  НАВИГАЦИЯ — состояние авторизации
+// ═══════════════════════════════════════════════════════════════════════════
+
+function updateNav() {
+    const session = getSession();
+    const guest = document.getElementById('guestNavBtns');
+    const user  = document.getElementById('userNavInfo');
+    const name  = document.getElementById('navUserName');
+    if (session) {
+        guest.style.display = 'none';
+        user.style.display  = '';
+        name.textContent    = session.name;
+    } else {
+        guest.style.display = '';
+        user.style.display  = 'none';
+    }
+}
+
+function logout() {
+    clearSession();
+    updateNav();
+    showSuccessMessage('До свидания!', 'Вы вышли из аккаунта.');
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ЗАЩИТА ОТ ПЕРЕБОРА (Brute Force)
+//  Логика хранится в объекте пользователя: failedAttempts, lockedUntil
+// ═══════════════════════════════════════════════════════════════════════════
+
+function getLockStatus(user) {
+    if (!user.lockedUntil) return { locked: false };
+    const remaining = user.lockedUntil - Date.now();
+    if (remaining > 0) return { locked: true, remaining };
+    return { locked: false }; // блокировка истекла
+}
+
+function recordFailedAttempt(users, userIndex) {
+    const user = users[userIndex];
+    user.failedAttempts = (user.failedAttempts || 0) + 1;
+    if (user.failedAttempts >= MAX_ATTEMPTS) {
+        user.lockedUntil = Date.now() + LOCK_MS;  // фиксируем время блокировки
+        user.failedAttempts = MAX_ATTEMPTS;        // не превышаем лимит
+    }
+    saveUsers(users);
+}
+
+function resetFailedAttempts(users, userIndex) {
+    users[userIndex].failedAttempts = 0;
+    users[userIndex].lockedUntil    = null;
+    saveUsers(users);
+}
+
+function showLockoutUI(remaining) {
+    const lockEl     = document.getElementById('loginLockout');
+    const lockText   = document.getElementById('loginLockoutText');
+    const attemptsEl = document.getElementById('attemptsInfo');
+    attemptsEl.style.display = 'none';
+    lockEl.style.display     = 'flex';
+    const mins = Math.ceil(remaining / 60000);
+    const secs = Math.ceil(remaining / 1000);
+    lockText.textContent =
+        `Аккаунт заблокирован на ${LOCK_MINUTES} минут после ${MAX_ATTEMPTS} неудачных попыток. ` +
+        `Осталось: ${mins > 0 ? mins + ' мин.' : secs + ' сек.'}`;
+
+    // обратный отсчёт
+    if (window._lockTimer) clearInterval(window._lockTimer);
+    window._lockTimer = setInterval(() => {
+        const rem2 = user => {
+            const u = findUserByEmail(document.getElementById('loginEmail').value);
+            return u?.lockedUntil ? u.lockedUntil - Date.now() : 0;
+        };
+        const r = rem2();
+        if (r <= 0) { clearInterval(window._lockTimer); lockEl.style.display='none'; return; }
+        const m = Math.ceil(r/60000);
+        const s = Math.ceil(r/1000);
+        lockText.textContent =
+            `Аккаунт заблокирован. Осталось: ${m > 0 ? m+' мин.' : s+' сек.'}`;
+    }, 1000);
+}
+
+function showAttemptsUI(attempts) {
+    const attemptsEl = document.getElementById('attemptsInfo');
+    const bar        = document.getElementById('attemptsBar');
+    const leftEl     = document.getElementById('attemptsLeft');
+    const left       = MAX_ATTEMPTS - attempts;
+    attemptsEl.style.display = '';
+    leftEl.textContent = `Осталось попыток: ${left}`;
+    bar.style.width    = (left / MAX_ATTEMPTS * 100) + '%';
+    bar.style.background = left === 1 ? '#dc3545' : '#ffc107';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  РЕГИСТРАЦИЯ
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.getElementById('registerForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    // очистка ошибок
+    ['regNameErr','regEmailErr','regPasswordErr','regPassword2Err'].forEach(id => showErr(id,''));
+    document.getElementById('registerError').style.display = 'none';
+
+    const name  = document.getElementById('regName').value;
+    const email = document.getElementById('regEmail').value;
+    const pwd   = document.getElementById('regPassword').value;
+    const pwd2  = document.getElementById('regPassword2').value;
+
+    // ── Валидация ────────────────────────────────────────────────────────
+    let valid = true;
+    const nameErr = validateName(name);   if (nameErr)  { showErr('regNameErr', nameErr);   valid=false; }
+    const emailErr= validateEmail(email); if (emailErr) { showErr('regEmailErr', emailErr); valid=false; }
+    const pwdErr  = validatePassword(pwd);if (pwdErr)   { showErr('regPasswordErr', pwdErr);valid=false; }
+    const pwd2Err = validateMatch(pwd,pwd2);if(pwd2Err) { showErr('regPassword2Err',pwd2Err);valid=false;}
+    if (!valid) return;
+
+    // ── Проверка уникальности email ──────────────────────────────────────
+    if (findUserByEmail(email)) {
+        document.getElementById('registerError').textContent = 'Пользователь с таким email уже зарегистрирован.';
+        document.getElementById('registerError').style.display = 'block';
+        return;
+    }
+
+    // ── Хеширование пароля (bcrypt) ──────────────────────────────────────
+    const btn = document.getElementById('registerSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Регистрация...';
+
+    const passwordHash = await hashPassword(pwd);
+
+    // ── Сохранение пользователя ──────────────────────────────────────────
+    const users = getUsers();
+    const newUser = {
+        id:             Date.now(),
+        name:           name.trim(),
+        email:          email.toLowerCase().trim(),
+        passwordHash,
+        role:           'user',
+        failedAttempts: 0,
+        lockedUntil:    null,
+        createdAt:      new Date().toISOString(),
+    };
+    users.push(newUser);
+    saveUsers(users);
+
+    // ── Создание сессии ──────────────────────────────────────────────────
+    const now = Date.now();
+    setSession({ userId: newUser.id, name: newUser.name, email: newUser.email, role: newUser.role, issuedAt: now, expiresAt: now + SESSION_TTL_MS });
+
+    btn.disabled = false; btn.textContent = 'Зарегистрироваться';
+    this.reset();
+    document.getElementById('pwdStrengthWrap').style.display = 'none';
+    updateNav();
+    closeAndOpenAccount('registerModal');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ВХОД + ЗАЩИТА ОТ BRUTE FORCE
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    ['loginEmailErr','loginPasswordErr'].forEach(id => showErr(id,''));
+    document.getElementById('loginError').style.display   = 'none';
+    document.getElementById('loginLockout').style.display = 'none';
+    document.getElementById('attemptsInfo').style.display = 'none';
+
+    const email = document.getElementById('loginEmail').value;
+    const pwd   = document.getElementById('loginPassword').value;
+
+    // ── Валидация ────────────────────────────────────────────────────────
+    let valid = true;
+    const emailErr = validateEmail(email); if (emailErr) { showErr('loginEmailErr', emailErr); valid=false; }
+    if (!pwd) { showErr('loginPasswordErr', 'Введите пароль'); valid=false; }
+    if (!valid) return;
+
+    const users     = getUsers();
+    const userIndex = users.findIndex(u => u.email === email.toLowerCase().trim());
+    const errEl     = document.getElementById('loginError');
+
+    // ── Пользователь не найден ────────────────────────────────────────────
+    if (userIndex === -1) {
+        errEl.textContent = 'Пользователь с таким email не найден.';
+        errEl.style.display = 'block';
+        return;
+    }
+
+    const user = users[userIndex];
+
+    // ── Проверка блокировки ──────────────────────────────────────────────
+    const lock = getLockStatus(user);
+    if (lock.locked) {
+        showLockoutUI(lock.remaining);
+        return;
+    }
+
+    // ── Проверка пароля ──────────────────────────────────────────────────
+    const btn = document.getElementById('loginSubmitBtn');
+    btn.disabled = true; btn.textContent = 'Проверка...';
+
+    const valid_pwd = await checkPassword(pwd, user.passwordHash);
+
+    btn.disabled = false; btn.textContent = 'Войти';
+
+    if (!valid_pwd) {
+        // ── Неверный пароль: фиксируем попытку ──────────────────────────
+        recordFailedAttempt(users, userIndex);
+        const updated = getUsers()[userIndex];
+        const lockNow = getLockStatus(updated);
+
+        if (lockNow.locked) {
+            showLockoutUI(lockNow.remaining);
+        } else {
+            showAttemptsUI(updated.failedAttempts);
+            errEl.textContent   = 'Неверный пароль.';
+            errEl.style.display = 'block';
+        }
+        return;
+    }
+
+    // ── Успешный вход: сброс счётчика ─────────────────────────────────────
+    resetFailedAttempts(users, userIndex);
+
+    // ── Создание сессии ──────────────────────────────────────────────────
+    const now = Date.now();
+    setSession({ userId: user.id, name: user.name, email: user.email, role: user.role, issuedAt: now, expiresAt: now + SESSION_TTL_MS });
+
+    this.reset();
+    if (window._lockTimer) clearInterval(window._lockTimer);
+    updateNav();
+    closeAndOpenAccount('loginModal');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ФОРМА ЗАКАЗА — сохранение в localStorage
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.getElementById('orderForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    ['orderNameErr','orderPhoneErr','orderEmailErr'].forEach(id => showErr(id,''));
+    document.getElementById('orderError').style.display = 'none';
+
+    const name    = document.getElementById('orderName').value;
+    const phone   = document.getElementById('orderPhone').value;
+    const email   = document.getElementById('orderEmail').value;
+    const comment = document.getElementById('orderComment').value;
+
+    // ── Валидация ────────────────────────────────────────────────────────
+    let valid = true;
+    const nameErr  = validateName(name);   if (nameErr)  { showErr('orderNameErr', nameErr);   valid=false; }
+    const phoneErr = validatePhone(phone); if (phoneErr) { showErr('orderPhoneErr', phoneErr); valid=false; }
+    if (email.trim() && !EMAIL_RE.test(email.trim())) {
+        showErr('orderEmailErr', 'Некорректный email'); valid=false;
+    }
+    if (!valid) return;
+
+    // ── Сохранение заказа ────────────────────────────────────────────────
+    const session = getSession();
+    const order = {
+        id:        Date.now(),
+        userId:    session?.userId ?? null,
+        name:      name.trim(),
+        phone:     phone.trim(),
+        email:     email.trim() || null,
+        comment:   comment.trim() || null,
+        cartItems: [...cart],
+        status:    'new',
+        createdAt: new Date().toISOString(),
+    };
+    saveOrder(order);
+
+    // Очистка
+    this.reset();
+    cart = [];
+    document.getElementById('cartInfo').style.display = 'none';
+    document.getElementById('cartText').textContent   = '';
+
+    showSuccessMessage('Спасибо за заказ!', 'Мы свяжемся с вами в ближайшее время для подтверждения.');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ФОРМА БРОНИРОВАНИЯ — сохранение в localStorage
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.getElementById('bookingForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    ['bookingDateErr','bookingTimeErr'].forEach(id => showErr(id,''));
+    document.getElementById('bookingFormError').style.display = 'none';
+
+    const date      = document.getElementById('bookingDate').value;
+    const time      = document.getElementById('bookingTime').value;
+    const eventType = document.getElementById('bookingEvent').value;
+    const guests    = document.getElementById('bookingGuests').value;
+
+    // ── Валидация ────────────────────────────────────────────────────────
+    let valid = true;
+    const dateErr = validateDate(date); if (dateErr) { showErr('bookingDateErr', dateErr); valid=false; }
+    const timeErr = validateTime(time); if (timeErr) { showErr('bookingTimeErr', timeErr); valid=false; }
+    if (!valid) return;
+
+    // ── Проверка: дата не в прошлом ──────────────────────────────────────
+    if (new Date(date) < new Date(new Date().toDateString())) {
+        showErr('bookingDateErr', 'Дата должна быть не в прошлом');
+        return;
+    }
+
+    // ── Сохранение ───────────────────────────────────────────────────────
+    const session = getSession();
+    const booking = {
+        id:        Date.now(),
+        userId:    session?.userId ?? null,
+        date, time, eventType, guests,
+        status:    'pending',
+        createdAt: new Date().toISOString(),
+    };
+    saveBooking(booking);
+
+    this.reset();
+    bootstrap.Modal.getInstance(document.getElementById('bookingModal')).hide();
+    showSuccessMessage('Бронирование принято!', `Ваш столик забронирован на ${formatDate(date)} в ${time}. Ждём вас!`);
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  КОРЗИНА
+// ═══════════════════════════════════════════════════════════════════════════
+
+function addToCart(btn, item) {
+    cart.push(item);
+    document.getElementById('cartText').textContent = cart.join('; ');
+    document.getElementById('cartInfo').style.display = '';
+    document.getElementById('orderComment').value = cart.join('; ');
+    btn.textContent = '✓ В корзине';
+    btn.classList.replace('btn-outline-primary','btn-success');
+    setTimeout(() => { btn.textContent='В корзину'; btn.classList.replace('btn-success','btn-outline-primary'); }, 1800);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ЛИЧНЫЙ КАБИНЕТ
+// ═══════════════════════════════════════════════════════════════════════════
+
+document.getElementById('accountModal').addEventListener('show.bs.modal', () => {
+    const session = getSession();
+    if (!session) return;
+
+    document.getElementById('accountName').textContent  = session.name;
+    document.getElementById('accountEmail').textContent = session.email;
+    document.getElementById('accountDate').textContent  =
+        'Сессия до: ' + new Date(session.expiresAt).toLocaleDateString('ru-RU');
+
+    // Заказы
+    const orders = getOrders().filter(o => o.userId === session.userId);
+    const ordersEl = document.getElementById('accountOrders');
+    if (orders.length === 0) {
+        ordersEl.innerHTML = '<p class="text-muted small mb-0">Нет заказов</p>';
+    } else {
+        ordersEl.innerHTML = orders.slice().reverse().map(o => `
+            <div class="record-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${o.name}</strong> · ${o.phone}
+                        ${o.comment ? `<div class="text-muted">${o.comment}</div>` : ''}
+                    </div>
+                    <span class="badge bg-warning text-dark ms-2">новый</span>
+                </div>
+                <div class="text-muted mt-1" style="font-size:0.8rem;">${formatDateTime(o.createdAt)}</div>
+            </div>`).join('');
+    }
+
+    // Бронирования
+    const bookings = getBookings().filter(b => b.userId === session.userId);
+    const bookEl = document.getElementById('accountBookings');
+    if (bookings.length === 0) {
+        bookEl.innerHTML = '<p class="text-muted small mb-0">Нет бронирований</p>';
+    } else {
+        bookEl.innerHTML = bookings.slice().reverse().map(b => `
+            <div class="record-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <strong>${b.eventType}</strong> · ${b.guests}
+                        <div class="text-muted">${formatDate(b.date)} в ${b.time}</div>
+                    </div>
+                    <span class="badge bg-info text-dark ms-2">ожидание</span>
+                </div>
+                <div class="text-muted mt-1" style="font-size:0.8rem;">${formatDateTime(b.createdAt)}</div>
+            </div>`).join('');
+    }
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+//  ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// ═══════════════════════════════════════════════════════════════════════════
+
+function showSuccessMessage(title, text) {
+    document.getElementById('successTitle').textContent = title;
+    document.getElementById('successText').textContent  = text;
+    const overlay = document.getElementById('successOverlay');
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => overlay.classList.add('show'));
+}
+function closeSuccessMessage() {
+    const overlay = document.getElementById('successOverlay');
+    overlay.classList.remove('show');
+    setTimeout(() => { overlay.style.display='none'; }, 300);
+}
+
+function togglePwd(inputId, btn) {
+    const inp = document.getElementById(inputId);
+    const show = inp.type === 'password';
+    inp.type = show ? 'text' : 'password';
+    btn.innerHTML = show ? '<i class="bi bi-eye-slash"></i>' : '<i class="bi bi-eye"></i>';
+}
+
+function switchModal(from, to) {
+    const fromEl = document.getElementById(from);
+    fromEl.addEventListener('hidden.bs.modal', function once() {
+        fromEl.removeEventListener('hidden.bs.modal', once);
+        bootstrap.Modal.getOrCreateInstance(document.getElementById(to)).show();
+    });
+    bootstrap.Modal.getOrCreateInstance(fromEl).hide();
+}
+
+function formatDate(iso) {
+    return new Date(iso).toLocaleDateString('ru-RU', { day:'2-digit', month:'long', year:'numeric' });
+}
+function formatDateTime(iso) {
+    return new Date(iso).toLocaleString('ru-RU', { day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+// ── Индикатор силы пароля ────────────────────────────────────────────────
+document.getElementById('regPassword').addEventListener('input', function() {
+    const wrap  = document.getElementById('pwdStrengthWrap');
+    const bar   = document.getElementById('pwdStrengthBar');
+    const label = document.getElementById('pwdStrengthLabel');
+    const v = this.value;
+    wrap.style.display = v.length ? '' : 'none';
+    let score = 0;
+    if (v.length >= 6)  score++;
+    if (v.length >= 10) score++;
+    if (/[A-ZА-Я]/.test(v)) score++;
+    if (/\d/.test(v))        score++;
+    if (/[^а-яА-Яa-zA-Z\d]/.test(v)) score++;
+    const levels = [
+        { w:'20%',  bg:'#dc3545', t:'Очень слабый' },
+        { w:'40%',  bg:'#fd7e14', t:'Слабый' },
+        { w:'60%',  bg:'#ffc107', t:'Средний' },
+        { w:'80%',  bg:'#20c997', t:'Хороший' },
+        { w:'100%', bg:'#198754', t:'Надёжный' },
+    ];
+    const lvl = levels[Math.max(0, score-1)];
+    bar.style.width      = lvl.w;
+    bar.style.background = lvl.bg;
+    label.textContent    = lvl.t;
+    label.style.color    = lvl.bg;
+});
+
+// ── Инициализация ────────────────────────────────────────────────────────
+updateNav();
+</script>
+</body>
+</html>
